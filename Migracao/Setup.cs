@@ -20,8 +20,8 @@ namespace Migracao
 
         public void RealizarLogin()
         {
-            const string Login = "leticiaem";
-            const string Senha = "mORAIS123";
+            const string Login = "";
+            const string Senha = "";
 
             driver.FindElement(By.Id("txbLogin")).SendKeys(Login);
             driver.FindElement(By.Id("txbSenha")).SendKeys(Senha + Keys.Enter);
