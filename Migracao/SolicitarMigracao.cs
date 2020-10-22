@@ -5,13 +5,12 @@ namespace Migracao
 {
     public class SolicitarMigracao
     {
-        private readonly IWebDriver _navegador;
+        private readonly IWebDriver navegador;
         private FiliadosParaMigrar filiadosParaMigrar;
 
-
-        public SolicitarMigracao(IWebDriver navegador)
+        public SolicitarMigracao(IWebDriver _navegador)
         {            
-            _navegador = navegador;
+            navegador = _navegador;
             filiadosParaMigrar = new FiliadosParaMigrar();
         }
 
@@ -31,21 +30,21 @@ namespace Migracao
 
         private void AcessarTelaSolicitarMigracao()
         {
-            _navegador.FindElement(By.XPath("//*[@id=\"1\"]/h3")).Click();
-            _navegador.FindElement(By.XPath("//*[@id=\"1\"]/ul/li[8]/a")).Click();
+            navegador.FindElement(By.XPath("//*[@id=\"1\"]/h3")).Click();
+            navegador.FindElement(By.XPath("//*[@id=\"1\"]/ul/li/a[@href=\"paginas/filiado/SolicitaMigracao.aspx\"]")).Click();
         }
 
         private void PesquisarMigracao(string documento)
         {
-            _navegador.FindElement(By.Id("ContentPlaceHolder1_txbCpf")).SendKeys(documento);
-            _navegador.FindElement(By.Id("ContentPlaceHolder1_btnPesquisar")).Click();
+            navegador.FindElement(By.Id("ContentPlaceHolder1_txbCpf")).SendKeys(documento);
+            navegador.FindElement(By.Id("ContentPlaceHolder1_btnPesquisar")).Click();
         }
 
         private string RealizarPedidoMigracao()
         {
-            _navegador.FindElement(By.Id("ContentPlaceHolder1_gvInfoFiliados_cbSeleciona_0")).Click();
-            _navegador.FindElement(By.Id("ContentPlaceHolder1_gvInfoFiliados_btnAdd")).Click();
-            return _navegador.FindElement(By.XPath("//*[@id=\"MyMessageBox1_MessageBoxInterface\"]/p")).Text;
+            navegador.FindElement(By.Id("ContentPlaceHolder1_gvInfoFiliados_cbSeleciona_0")).Click();
+            navegador.FindElement(By.Id("ContentPlaceHolder1_gvInfoFiliados_btnAdd")).Click();
+            return navegador.FindElement(By.XPath("//*[@id=\"MyMessageBox1_MessageBoxInterface\"]/p")).Text;
         }
 
         private void GravarLog(string documento, string retorno)
