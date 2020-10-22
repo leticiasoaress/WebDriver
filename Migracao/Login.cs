@@ -41,7 +41,7 @@ namespace Migracao
             navegador.FindElement(By.Id("ContentPlaceHolder1_ddlSubFranquia")).Click();
             {
                 var dropdown = navegador.FindElement(By.Id("ContentPlaceHolder1_ddlSubFranquia"));
-                dropdown.FindElement(By.XPath("//*[@id=\"ContentPlaceHolder1_ddlSubFranquia\"]/option[2]")).Click();
+                dropdown.FindElement(By.XPath("//*[@id=\"ContentPlaceHolder1_ddlSubFranquia\"]/option[5]")).Click();
             }
         }
 
@@ -50,7 +50,7 @@ namespace Migracao
             navegador.FindElement(By.Id("ContentPlaceHolder1_ddlFranquia")).Click();
             {
                 var dropdown = navegador.FindElement(By.Id("ContentPlaceHolder1_ddlSubFranquia"));
-                dropdown.FindElement(By.XPath("//*[@id=\"ContentPlaceHolder1_ddlFranquia\"]/option[33]")).Click();
+                dropdown.FindElement(By.XPath("//*[@id=\"ContentPlaceHolder1_ddlFranquia\"]/option[23]")).Click();
             }
             navegador.FindElement(By.Id("ContentPlaceHolder1_btnConfirmar")).Click();
         }

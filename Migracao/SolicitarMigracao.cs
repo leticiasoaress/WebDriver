@@ -6,33 +6,39 @@ namespace Migracao
     public class SolicitarMigracao
     {
         private readonly IWebDriver _navegador;
+        private FiliadosParaMigrar filiadosParaMigrar;
+
 
         public SolicitarMigracao(IWebDriver navegador)
         {            
             _navegador = navegador;
+            filiadosParaMigrar = new FiliadosParaMigrar();
         }
 
         public void ConfigurarOrdemExecucao()
         {
             Console.Clear();
             Console.WriteLine("Iniciando pedido de migração.\n\n");
-            AcessarTelaSolicitarMigracao();
-            var cpfInformado = PesquisarMigracao();
-            var retorno = RealizarPedidoMigracao();
-            GravarLog(cpfInformado, retorno);
+            Console.WriteLine("Log dos documentos");
+            foreach (var documento in filiadosParaMigrar.listaDocumento)
+            {
+                AcessarTelaSolicitarMigracao();
+                PesquisarMigracao(documento);
+                var retorno = RealizarPedidoMigracao();
+                GravarLog(documento, retorno);
+            } 
         }
 
         private void AcessarTelaSolicitarMigracao()
         {
             _navegador.FindElement(By.XPath("//*[@id=\"1\"]/h3")).Click();
-            _navegador.FindElement(By.XPath("//*[@id=\"1\"]/ul/li[6]/a")).Click();
+            _navegador.FindElement(By.XPath("//*[@id=\"1\"]/ul/li[8]/a")).Click();
         }
 
-        private string PesquisarMigracao()
+        private void PesquisarMigracao(string documento)
         {
-            _navegador.FindElement(By.Id("ContentPlaceHolder1_txbCpf")).SendKeys("12183934670");
+            _navegador.FindElement(By.Id("ContentPlaceHolder1_txbCpf")).SendKeys(documento);
             _navegador.FindElement(By.Id("ContentPlaceHolder1_btnPesquisar")).Click();
-            return _navegador.FindElement(By.XPath("//*[@id=\"ContentPlaceHolder1_gvInfoFiliados\"]/tbody/tr[2]/td[3]")).Text;
         }
 
         private string RealizarPedidoMigracao()
@@ -42,10 +48,9 @@ namespace Migracao
             return _navegador.FindElement(By.XPath("//*[@id=\"MyMessageBox1_MessageBoxInterface\"]/p")).Text;
         }
 
-        private void GravarLog(string cpf, string retorno)
-        {
-            Console.WriteLine("Log dos pedidos");
-            Console.WriteLine($@"CPF: {cpf} --> Retorno: {retorno}");     
+        private void GravarLog(string documento, string retorno)
+        {          
+            Console.WriteLine($@"Documento: {documento} --> Retorno: {retorno}");     
         }
     }
 }
