@@ -2,19 +2,20 @@
 {
     public class FiliadosParaMigrar
     {
-        public readonly string[] listaDocumento;
+        public readonly DadosFiliado[] listaFiliado;
 
         public FiliadosParaMigrar()
         {
-            listaDocumento = new string[]
+            listaFiliado = new DadosFiliado[]
             {
-                "11111111111",
-                "22222222222",
-                "33333333333",
-                "44444444444",
-                "55555555555",
-                "66666666666"
-            };
+                new DadosFiliado("17435358649", 97),
+                new DadosFiliado("21620130610", 63),
+                new DadosFiliado("03195749629", 57),
+                new DadosFiliado("50621637653", 61),
+                new DadosFiliado("30723833672", 118),
+                new DadosFiliado("30525705600", 108),
+                new DadosFiliado("03152264631", 426),
+             };
         }
     }
 }

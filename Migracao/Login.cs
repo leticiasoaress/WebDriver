@@ -10,7 +10,12 @@ namespace Migracao
         private IWebDriver navegador;
 
         public string login { get; private set; }
+
         public string senha { get; private set; }
+
+        private const int IdRegional = 1000;
+
+        private const int IdFranquiaDestino = 46;
 
         public Login(IWebDriver _navegador)
         {
@@ -41,7 +46,7 @@ namespace Migracao
             navegador.FindElement(By.Id("ContentPlaceHolder1_ddlSubFranquia")).Click();
             {
                 var dropdown = navegador.FindElement(By.Id("ContentPlaceHolder1_ddlSubFranquia"));
-                dropdown.FindElement(By.XPath("//*[@id=\"ContentPlaceHolder1_ddlSubFranquia\"]/option[5]")).Click();
+                dropdown.FindElement(By.XPath("//select/option[@value=" + IdRegional + "]")).Click();
             }
         }
 
@@ -50,7 +55,7 @@ namespace Migracao
             navegador.FindElement(By.Id("ContentPlaceHolder1_ddlFranquia")).Click();
             {
                 var dropdown = navegador.FindElement(By.Id("ContentPlaceHolder1_ddlSubFranquia"));
-                dropdown.FindElement(By.XPath("//*[@id=\"ContentPlaceHolder1_ddlFranquia\"]/option[23]")).Click();
+                dropdown.FindElement(By.XPath("//select/option[@value="+ IdFranquiaDestino +"]")).Click();             
             }
             navegador.FindElement(By.Id("ContentPlaceHolder1_btnConfirmar")).Click();
         }
