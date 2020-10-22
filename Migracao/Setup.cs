@@ -2,6 +2,7 @@
 using OpenQA.Selenium.Chrome;
 using System;
 
+
 namespace Migracao
 {
     public class Setup
@@ -9,16 +10,19 @@ namespace Migracao
         private IWebDriver driver;
         private Login login;
         private SolicitarMigracao solicitarMigracao;
+        private AutorizarMigracao autorizarMigracao;
+       
 
         public Setup(string url)
         {
             driver = new ChromeDriver();
             driver.Url = url;
             driver.Manage().Window.Maximize();
-            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(40);
 
             login = new Login(driver);
             solicitarMigracao = new SolicitarMigracao(driver);
+            autorizarMigracao = new AutorizarMigracao(driver);
         }
 
         public void ConfigurarOrdemExecucao()
@@ -27,7 +31,8 @@ namespace Migracao
             InformarAcesso();
             login.SelecionarRegional();
             login.SelecionarFranquia();
-            solicitarMigracao.ConfigurarOrdemExecucao();            
+            //solicitarMigracao.ConfigurarOrdemExecucao();
+            autorizarMigracao.ConfigurarOrdemExecucao();
         }
 
         public void InformarAcesso()

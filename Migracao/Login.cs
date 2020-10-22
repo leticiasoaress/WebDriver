@@ -1,7 +1,7 @@
 ﻿using OpenQA.Selenium;
 using System;
-using System.Collections.Generic;
-using System.Text;
+using SupportUI = OpenQA.Selenium.Support.UI;
+using SeleniumExtras.WaitHelpers;
 
 namespace Migracao
 {
@@ -17,9 +17,12 @@ namespace Migracao
 
         private const int IdFranquiaDestino = 46;
 
+        private SupportUI.WebDriverWait wait;
+
         public Login(IWebDriver _navegador)
         {
             navegador = _navegador;
+            wait = new SupportUI.WebDriverWait(_navegador, TimeSpan.FromSeconds(40));
         }
 
         private void SetLogin(string _login)
@@ -52,9 +55,11 @@ namespace Migracao
 
         public void SelecionarFranquia()
         {
+            wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("ContentPlaceHolder1_ddlFranquia")));
+
             navegador.FindElement(By.Id("ContentPlaceHolder1_ddlFranquia")).Click();
             {
-                var dropdown = navegador.FindElement(By.Id("ContentPlaceHolder1_ddlSubFranquia"));
+                var dropdown = navegador.FindElement(By.Id("ContentPlaceHolder1_ddlFranquia"));              
                 dropdown.FindElement(By.XPath("//select/option[@value="+ IdFranquiaDestino +"]")).Click();             
             }
             navegador.FindElement(By.Id("ContentPlaceHolder1_btnConfirmar")).Click();
