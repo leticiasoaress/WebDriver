@@ -20,12 +20,12 @@ namespace Migracao
             Console.Clear();
             Console.WriteLine("Iniciando pedido de migração.\n\n");
             Console.WriteLine("Log dos documentos");
-            foreach (var documento in filiadosParaMigrar.listaDocumento)
+            foreach (var filiado in filiadosParaMigrar.listaFiliado)
             {
                 AcessarTelaSolicitarMigracao();
-                PesquisarMigracao(documento);
+                PesquisarMigracao(filiado.documento);
                 var retorno = RealizarPedidoMigracao();
-                GravarLog(documento, retorno);
+                GravarLog(filiado.documento, retorno);
             } 
         }
 
