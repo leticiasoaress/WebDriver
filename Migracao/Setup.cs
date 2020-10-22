@@ -7,48 +7,43 @@ namespace Migracao
     public class Setup
     {
         private IWebDriver driver;
+        private Login login;
+        private SolicitarMigracao solicitarMigracao;
 
-        public IWebDriver ConfigurarNavegador()
+        public Setup(string url)
         {
             driver = new ChromeDriver();
-            driver.Url = "http://treinamento.sistematodos.com.br:82/CTN/Login.aspx";
+            driver.Url = url;
             driver.Manage().Window.Maximize();
             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
 
-            return driver;
+            login = new Login(driver);
+            solicitarMigracao = new SolicitarMigracao(driver);
         }
 
-        public void RealizarLogin()
+        public void ConfigurarOrdemExecucao()
         {
-            const string Login = "";
-            const string Senha = "";
-
-            driver.FindElement(By.Id("txbLogin")).SendKeys(Login);
-            driver.FindElement(By.Id("txbSenha")).SendKeys(Senha + Keys.Enter);
+            Console.Clear();
+            InformarAcesso();
+            login.SelecionarRegional();
+            login.SelecionarFranquia();
+            solicitarMigracao.ConfigurarOrdemExecucao();            
         }
 
-        public void SelecionarRegional()
+        public void InformarAcesso()
         {
-            driver.FindElement(By.Id("ContentPlaceHolder1_ddlSubFranquia")).Click();
-            {
-                var dropdown = driver.FindElement(By.Id("ContentPlaceHolder1_ddlSubFranquia"));
-                dropdown.FindElement(By.XPath("//*[@id=\"ContentPlaceHolder1_ddlSubFranquia\"]/option[2]")).Click();
-            }
-        }
+            Console.WriteLine("Gentileza informar o acesso ao sistema");
+            Console.Write("Login: ");
+            var _login = Console.ReadLine();
+            Console.Write("Senha: ");
+            var _senha = Console.ReadLine();
 
-        public void SelecionarFranquia()
-        {
-            driver.FindElement(By.Id("ContentPlaceHolder1_ddlFranquia")).Click();
-            {
-                var dropdown = driver.FindElement(By.Id("ContentPlaceHolder1_ddlSubFranquia"));
-                dropdown.FindElement(By.XPath("//*[@id=\"ContentPlaceHolder1_ddlFranquia\"]/option[33]")).Click();
-            }
-            driver.FindElement(By.Id("ContentPlaceHolder1_btnConfirmar")).Click();
+            login.ConfigurarLogin(_login, _senha);
         }
 
         public void FinalizarProcesso()
         {
-            Console.WriteLine("Finalizando aplicação! \n Pressiona qualquer tecla para continuar....");
+            Console.WriteLine("\n\n Finalizando aplicação! \n Pressiona qualquer tecla para sair....");
             Console.ReadKey();
             driver.Quit();
         }
