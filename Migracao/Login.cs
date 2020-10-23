@@ -46,6 +46,8 @@ namespace Migracao
 
         public void SelecionarRegional()
         {
+            wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("ContentPlaceHolder1_ddlSubFranquia")));
+
             navegador.FindElement(By.Id("ContentPlaceHolder1_ddlSubFranquia")).Click();
             {
                 var dropdown = navegador.FindElement(By.Id("ContentPlaceHolder1_ddlSubFranquia"));

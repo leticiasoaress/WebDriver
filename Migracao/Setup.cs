@@ -18,7 +18,7 @@ namespace Migracao
             driver = new ChromeDriver();
             driver.Url = url;
             driver.Manage().Window.Maximize();
-            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(40);
+            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
 
             login = new Login(driver);
             solicitarMigracao = new SolicitarMigracao(driver);
