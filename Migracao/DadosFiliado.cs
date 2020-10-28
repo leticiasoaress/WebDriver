@@ -10,10 +10,13 @@ namespace Migracao
 
         public int idFranquiaOrigem { get; set; }
 
-        public DadosFiliado(string _documento, int _idFranquia)
+        public int idRegionalOrigem { get; set; }
+
+        public DadosFiliado(string _documento, int _idRegionalOrigem, int _idFranquia)
         {
             documento = _documento;
             idFranquiaOrigem = _idFranquia;
+            idRegionalOrigem = _idRegionalOrigem;
         }
     }
 }

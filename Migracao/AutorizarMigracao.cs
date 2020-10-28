@@ -1,8 +1,10 @@
 ﻿using OpenQA.Selenium;
+using SeleniumExtras.WaitHelpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using SupportUI = OpenQA.Selenium.Support.UI;
 
 namespace Migracao
 {
@@ -10,11 +12,15 @@ namespace Migracao
     {
         private readonly IWebDriver navegador;
         private FiliadosParaMigrar filiadosParaMigrar;
+        private SupportUI.WebDriverWait wait;
+        private Base _base;
 
         public AutorizarMigracao(IWebDriver _navegador)
         {
             navegador = _navegador;
             filiadosParaMigrar = new FiliadosParaMigrar();
+            wait = new SupportUI.WebDriverWait(_navegador, TimeSpan.FromSeconds(60));
+            _base = new Base(_navegador);
         }
 
         public void ConfigurarOrdemExecucao()
@@ -22,6 +28,7 @@ namespace Migracao
             Console.WriteLine("\n\n Iniciando autorização de migração.\n\n");
             Console.WriteLine("Log das autorizações");
             AcessarTelaAutorizarMigracao();
+            BtnAutorizarMigracao();
             //foreach (var filiado in filiadosParaMigrar.listaFiliado)
             //{
             //    AcessarTelaAutorizarMigracao();
@@ -34,80 +41,40 @@ namespace Migracao
         private void AcessarTelaAutorizarMigracao()
         {
             navegador.FindElement(By.XPath("//*[@id=\"1\"]/h3")).Click();
-            navegador.FindElement(By.XPath("//*[@id=\"1\"]/ul/li/a[@href=\"paginas/filiado/Migracao.aspx\"]")).Click();
-            navegador.FindElement(By.Id("ContentPlaceHolder1_ddlTipoAutorizacao")).Click();
+            navegador.FindElement(By.XPath("//*[@id=\"1\"]/ul/li/a[@href=\"paginas/filiado/AutorizaMigracao.aspx\"]")).Click();
+        }
+
+        private void BtnAutorizarMigracao()
+        {
+            //var classRowStyleDinamico = navegador.FindElements(By.XPath("//*[@id=\"ContentPlaceHolder1_gvAutorizaMigracao\"]/tbody/tr[@class=\"RowStyle-Dinamico\"]"));
+            //var classAlternatingRowStyleDinamico = navegador.FindElements(By.XPath("//*[@id=\"ContentPlaceHolder1_gvAutorizaMigracao\"]/tbody/tr[@class=\"AlternatingRowStyle-Dinamico\"]"));
+            const string Processo = "Autorizar migração";
+            const string XPathPaginacao = "//*[@id=\"ContentPlaceHolder1_gvAutorizaMigracao\"]/tbody/tr[@class=\"paginacao-dinamico\"]/td/table/tbody/tr";
+            const string MessageBox = "\"MyMessageBox1_MessageBoxInterface\"";
+            var idTabelaAutorizacao = "\"ContentPlaceHolder1_gvAutorizaMigracao\"";
+            
+            var filiadosFranquia = filiadosParaMigrar.listaFiliado.Where(m => m.idFranquiaOrigem == 46).ToList();
+            var quantidadePagina = 1;
+
+            if (_base.VerificarPaginacao(idTabelaAutorizacao))
             {
-                var dropdown = navegador.FindElement(By.Id("ContentPlaceHolder1_ddlTipoAutorizacao"));
-                dropdown.FindElement(By.XPath("//select/option[@value=1]")).Click();
+                var paginacao = navegador.FindElements(By.XPath(XPathPaginacao));
+                quantidadePagina = paginacao.Count();
             }
 
-            navegador.FindElement(By.Id("ddlMeses")).Click();
+            for (int i = 0; i < filiadosFranquia.Count(); i++)
             {
-                var dropdown = navegador.FindElement(By.Id("ddlMeses"));
-                dropdown.FindElement(By.XPath("//select/option[@value=6]")).Click();
-            }
-
-            navegador.FindElement(By.Id("ddlAno")).Click();
-            {
-                var dropdown = navegador.FindElement(By.Id("ddlAno"));
-                dropdown.FindElement(By.XPath("//select/option[@value=2018]")).Click();
-            }
-
-            navegador.FindElement(By.Id("ContentPlaceHolder1_btnPesquisar")).Click();
-
-            if (VerificarPaginacao())
-            {
-                var paginacao = navegador.FindElements(By.XPath("//*[@id=\"ContentPlaceHolder1_gvMigracao\"]/tbody/tr[@class=\"paginacao-dinamico\"]/td/table/tbody/tr"));
-                var classRowStyleDinamico = navegador.FindElements(By.XPath("//*[@id=\"ContentPlaceHolder1_gvMigracao\"]/tbody/tr[@class=\"RowStyle-Dinamico\"]"));
-                var classAlternatingRowStyleDinamico = navegador.FindElements(By.XPath("//*[@id=\"ContentPlaceHolder1_gvMigracao\"]/tbody/tr[@class=\"AlternatingRowStyle-Dinamico\"]"));
-
-                var filiadosFranquia = filiadosParaMigrar.listaFiliado.Where(m => m.idFranquiaOrigem == 46).ToList();
-                IWebElement elemento = null;
-
-                for (int i = 0; i < filiadosFranquia.Count(); i++)
+                var (filiado, classe) = _base.PercorrerPaginacao(filiadosFranquia[i].documento, quantidadePagina, idTabelaAutorizacao);
+                if (filiado != null)
                 {
-                    elemento = LocalizarDocumentoNaTela(filiadosFranquia[i].documento, classRowStyleDinamico, "RowStyle-Dinamico");
-                    if (elemento == null)
-                    {
-                        elemento = LocalizarDocumentoNaTela(filiadosFranquia[i].documento, classAlternatingRowStyleDinamico, "AlternatingRowStyle-Dinamico");
-                    }
+                    var btnAutorizar = "//*[@id="+ idTabelaAutorizacao + "]/tbody/tr[@class=" + classe + "]/td/input[@title=\"Autorizar\"]";
+                    filiado.FindElement(By.XPath(btnAutorizar)).Click();
                     
-                    if(elemento != null)
-                    {
-                        Console.WriteLine(elemento.Text);
-                    }
-                    else
-                    {
-                        var proximaPagina = 2;
-                        var mudarPagina = navegador.FindElements(By.XPath("//*[@id=\"ContentPlaceHolder1_gvMigracao\"]/tbody/tr[@class=\"paginacao-dinamico\"]/td/table/tbody/tr/td/a")).Where(m=>m.Text == proximaPagina.ToString()).FirstOrDefault();
-                        mudarPagina.Click();
-                    }
+                    wait.Until(ExpectedConditions.ElementToBeClickable(By.Id(MessageBox)));                    
+                    var retorno = navegador.FindElement(By.Id(MessageBox)).Text;
+                    
+                    _base.GravarLog(filiadosFranquia[i].documento, retorno, Processo);
                 }
-            }
-        }
-
-        private IWebElement LocalizarDocumentoNaTela(string documento, ReadOnlyCollection<IWebElement> classRow, string nomeClass)
-        {
-            try 
-            {
-                return navegador.FindElements(By.XPath("//*[@id=\"ContentPlaceHolder1_gvMigracao\"]/tbody/tr[@class="+ nomeClass +"]")).Where(m => m.Text.Contains(documento)).FirstOrDefault();
-            }
-            catch 
-            {
-                return null;
-            }
-        }
-
-        private bool VerificarPaginacao()
-        {
-            try
-            {
-                navegador.FindElement(By.XPath("//*[@id=\"ContentPlaceHolder1_gvMigracao\"]/tbody/tr[@class=\"paginacao-dinamico\"]"));
-                return true;
-            }
-            catch (NoSuchElementException)
-            {
-                return false;
             }
         }
     }
