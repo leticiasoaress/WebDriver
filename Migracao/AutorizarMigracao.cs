@@ -29,13 +29,6 @@ namespace Migracao
             Console.WriteLine("Log das autorizações");
             AcessarTelaAutorizarMigracao();
             BtnAutorizarMigracao();
-            //foreach (var filiado in filiadosParaMigrar.listaFiliado)
-            //{
-            //    AcessarTelaAutorizarMigracao();
-            //    //PesquisarMigracao(filiado.documento);
-            //    //var retorno = RealizarPedidoMigracao();
-            //    //GravarLog(filiado.documento, retorno);
-            //}
         }
 
         private void AcessarTelaAutorizarMigracao()
@@ -46,11 +39,8 @@ namespace Migracao
 
         private void BtnAutorizarMigracao()
         {
-            //var classRowStyleDinamico = navegador.FindElements(By.XPath("//*[@id=\"ContentPlaceHolder1_gvAutorizaMigracao\"]/tbody/tr[@class=\"RowStyle-Dinamico\"]"));
-            //var classAlternatingRowStyleDinamico = navegador.FindElements(By.XPath("//*[@id=\"ContentPlaceHolder1_gvAutorizaMigracao\"]/tbody/tr[@class=\"AlternatingRowStyle-Dinamico\"]"));
             const string Processo = "Autorizar migração";
             const string XPathPaginacao = "//*[@id=\"ContentPlaceHolder1_gvAutorizaMigracao\"]/tbody/tr[@class=\"paginacao-dinamico\"]/td/table/tbody/tr";
-            const string MessageBox = "\"MyMessageBox1_MessageBoxInterface\"";
             var idTabelaAutorizacao = "\"ContentPlaceHolder1_gvAutorizaMigracao\"";
             
             var filiadosFranquia = filiadosParaMigrar.listaFiliado.Where(m => m.idFranquiaOrigem == 46).ToList();
@@ -70,11 +60,13 @@ namespace Migracao
                     var btnAutorizar = "//*[@id="+ idTabelaAutorizacao + "]/tbody/tr[@class=" + classe + "]/td/input[@title=\"Autorizar\"]";
                     filiado.FindElement(By.XPath(btnAutorizar)).Click();
                     
-                    wait.Until(ExpectedConditions.ElementToBeClickable(By.Id(MessageBox)));                    
-                    var retorno = navegador.FindElement(By.Id(MessageBox)).Text;
+                    wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("MyMessageBox1_MessageBoxInterface")));                    
+                    var retorno = navegador.FindElement(By.Id("MyMessageBox1_MessageBoxInterface")).Text;
                     
                     _base.GravarLog(filiadosFranquia[i].documento, retorno, Processo);
                 }
+                _base.AcessarPaginaPrincipal();
+                AcessarTelaAutorizarMigracao();
             }
         }
     }
