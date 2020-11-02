@@ -11,7 +11,7 @@ namespace Migracao
         private Login login;
         private SolicitarMigracao solicitarMigracao;
         private AutorizarMigracao autorizarMigracao;
-       
+        private MigrarFiliado migrarFiliado;
 
         public Setup(string url)
         {
@@ -22,17 +22,19 @@ namespace Migracao
 
             login = new Login(driver);
             solicitarMigracao = new SolicitarMigracao(driver);
-            autorizarMigracao = new AutorizarMigracao(driver);
+            autorizarMigracao = new AutorizarMigracao(driver, login);
+            migrarFiliado = new MigrarFiliado(driver);
         }
 
         public void ConfigurarOrdemExecucao()
         {
             Console.Clear();
             InformarAcesso();
-            login.SelecionarRegional();
-            login.SelecionarFranquia();
+            login.SelecionarRegional(1);
+            login.SelecionarFranquia(7);
             //solicitarMigracao.ConfigurarOrdemExecucao();
-            autorizarMigracao.ConfigurarOrdemExecucao();
+            //autorizarMigracao.ConfigurarOrdemExecucao();
+            migrarFiliado.ConfigurarOrdemExecucao();
         }
 
         public void InformarAcesso()

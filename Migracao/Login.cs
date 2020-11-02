@@ -13,10 +13,6 @@ namespace Migracao
 
         public string senha { get; private set; }
 
-        private const int IdRegional = 1000;
-
-        private const int IdFranquiaDestino = 46;
-
         private SupportUI.WebDriverWait wait;
 
         public Login(IWebDriver _navegador)
@@ -40,31 +36,41 @@ namespace Migracao
             SetLogin(_login);
             SetSenha(_senha);
 
+            wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("txbLogin")));
+
             navegador.FindElement(By.Id("txbLogin")).SendKeys(_login);
             navegador.FindElement(By.Id("txbSenha")).SendKeys(_senha + Keys.Enter);
         }
 
-        public void SelecionarRegional()
+        public void SelecionarRegional(int idRegional)
         {
             wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("ContentPlaceHolder1_ddlSubFranquia")));
 
             navegador.FindElement(By.Id("ContentPlaceHolder1_ddlSubFranquia")).Click();
             {
                 var dropdown = navegador.FindElement(By.Id("ContentPlaceHolder1_ddlSubFranquia"));
-                dropdown.FindElement(By.XPath("//select/option[@value=" + IdRegional + "]")).Click();
+                dropdown.FindElement(By.XPath("//select/option[@value=" + idRegional + "]")).Click();
             }
         }
 
-        public void SelecionarFranquia()
+        public void SelecionarFranquia(int idFranquia)
         {
             wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("ContentPlaceHolder1_ddlFranquia")));
 
             navegador.FindElement(By.Id("ContentPlaceHolder1_ddlFranquia")).Click();
             {
                 var dropdown = navegador.FindElement(By.Id("ContentPlaceHolder1_ddlFranquia"));              
-                dropdown.FindElement(By.XPath("//select/option[@value="+ IdFranquiaDestino +"]")).Click();             
+                dropdown.FindElement(By.XPath("//select/option[@value="+ idFranquia + "]")).Click();             
             }
             navegador.FindElement(By.Id("ContentPlaceHolder1_btnConfirmar")).Click();
+        }
+
+        public void AlterarFranquia(int idRegional, int idFranquia)
+        {
+            navegador.FindElement(By.XPath("//*[@id=\"btSair\"]")).Click();
+            ConfigurarLogin(login, senha);
+            SelecionarRegional(idRegional);
+            SelecionarFranquia(idFranquia);
         }
     }
 }

@@ -6,7 +6,8 @@ namespace Migracao
     {
         private static string[] listaUrl = {
                                              "http://treinamento.sistematodos.com.br:82/CTN/Login.aspx",
-                                             "https://homologacao.sistematodos.com.br/CTN/Login.aspx"
+                                             "https://homologacao.sistematodos.com.br/CTN/Login.aspx",
+                                             "http://treinamento.sistematodos.com.br:82/CTN_CO/Login.aspx"
                                            };
 
         private static void Main(string[] args)
@@ -24,6 +25,7 @@ namespace Migracao
             Console.WriteLine("Escolha o ambiente que deseja utilizar");
             Console.WriteLine("1 - Treinamento CTN");
             Console.WriteLine("2 - Homologação CTN");
+            Console.WriteLine("3 - Treinamento CTN CO");
             Console.Write("\nSistema desejado: ");
             var opcao = Console.ReadLine();
             switch (Convert.ToInt32(opcao))
@@ -32,6 +34,8 @@ namespace Migracao
                     return listaUrl[0];
                 case 2:
                     return listaUrl[1];
+                case 3:
+                    return listaUrl[2];
                 default:
                     Console.WriteLine("Opção inválida!");
                     Environment.Exit(0);

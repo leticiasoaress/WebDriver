@@ -1,9 +1,7 @@
 ﻿using OpenQA.Selenium;
 using SeleniumExtras.WaitHelpers;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using SupportUI = OpenQA.Selenium.Support.UI;
 
 namespace Migracao
@@ -86,9 +84,8 @@ namespace Migracao
             }
         }
 
-        public void GravarLog(string documento, string retorno, string processo)
+        public void GravarLog(string documento, string retorno)
         {
-            Console.WriteLine(processo);
             Console.WriteLine($@"Documento: {documento} --> Retorno: {retorno}");
         }
 
