@@ -11,3 +11,7 @@ Deverá ser informado o seu acesso ao sistema escolhido.
 Selecionar a regional e franquia que deseja acessar.
 #### Solicitar migração.
 Solicitar migrações de uma unidade para outra.
+#### Autorizar migração
+Autorizar as migração acessando as unidades de origem, sem precisar digitar senha novamente.
+#### Migrar filiado
+Completar o processo de migração utilizando a mesma forma de pagamento da franquia de origem.
