@@ -3,6 +3,9 @@ using SeleniumExtras.WaitHelpers;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net.Http.Headers;
+using System.Runtime.InteropServices;
+using System.Threading;
 using SupportUI = OpenQA.Selenium.Support.UI;
 
 namespace Migracao
@@ -32,49 +35,49 @@ namespace Migracao
 
         private void AcessarTelaFinalizarMigracao()
         {
-            navegador.FindElement(By.XPath("//*[@id=\"1\"]/h3")).Click();
-            navegador.FindElement(By.XPath("//*[@id=\"1\"]/ul/li/a[@href=\"paginas/filiado/Migracao.aspx\"]")).Click();
-            navegador.FindElement(By.Id("ContentPlaceHolder1_ddlTipoAutorizacao")).Click();
+            var menuUsuario = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[@id=\"1\"]/h3")));
+            menuUsuario.Click();
+
+            var migracao = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[@id=\"1\"]/ul/li/a[@href=\"paginas/filiado/Migracao.aspx\"]")));
+            migracao.Click();
+
+            var tipoAutorizacao = wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("ContentPlaceHolder1_ddlTipoAutorizacao")));
+            tipoAutorizacao.Click();
             {
-                var dropdown = navegador.FindElement(By.Id("ContentPlaceHolder1_ddlTipoAutorizacao"));
-                dropdown.FindElement(By.XPath("//select/option[@value=1]")).Click();
+                tipoAutorizacao.FindElement(By.XPath("//select/option[@value=1]")).Click();
             }
 
-            navegador.FindElement(By.Id("ContentPlaceHolder1_dtAnoMes_ddlMeses")).Click();
+            var ddlMeses = wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("ContentPlaceHolder1_dtAnoMes_ddlMeses")));
+            ddlMeses.Click();
             {
-                var dropdown = navegador.FindElement(By.Id("ContentPlaceHolder1_dtAnoMes_ddlMeses"));
-                dropdown.FindElement(By.XPath("//select/option[@value=10]")).Click();
+                ddlMeses.FindElement(By.XPath("//select/option[@value=11]")).Click();
             }
 
-            navegador.FindElement(By.Id("ContentPlaceHolder1_dtAnoMes_ddlAno")).Click();
+            var ddlAno = wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("ContentPlaceHolder1_dtAnoMes_ddlAno")));
+            ddlAno.Click();
             {
-                var dropdown = navegador.FindElement(By.Id("ContentPlaceHolder1_dtAnoMes_ddlAno"));
-                dropdown.FindElement(By.XPath("//select/option[@value=2020]")).Click();
+                ddlAno.FindElement(By.XPath("//select/option[@value=2020]")).Click();
             }
 
-            navegador.FindElement(By.Id("ContentPlaceHolder1_btnPesquisar")).Click();
+            var btnPesquisar = wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("ContentPlaceHolder1_btnPesquisar")));
+            btnPesquisar.Click();
         }
 
         private void VerificarPedidosMigracao()
         {
-            const string XPathPaginacao = "//*[@id=\"ContentPlaceHolder1_gvMigracao\"]/tbody/tr[@class=\"paginacao-dinamico\"]/td/table/tbody/tr";
             var idTabelaMigracao = "\"ContentPlaceHolder1_gvMigracao\"";
-            var quantidadePagina = 1;
             var filiadosFranquia = filiadosParaMigrar.listaFiliado.ToList();
 
-            if (_base.VerificarPaginacao(idTabelaMigracao))
-            {
-                var paginacao = navegador.FindElements(By.XPath(XPathPaginacao));
-                quantidadePagina = paginacao.Count();
-            }
+            var paginacao = _base.VerificarPaginacao(idTabelaMigracao);
 
             for (int i = 0; i < filiadosFranquia.Count(); i++)
             {
-                var (elementFiliado, classe) = _base.PercorrerPaginacao(filiadosFranquia[i].documento, quantidadePagina, idTabelaMigracao);
+                var (elementFiliado, classe) = _base.PercorrerPaginacao(filiadosFranquia[i].documento, paginacao, idTabelaMigracao);
                 if (elementFiliado != null)
                 {
                     BtnConfirmarMigracao(filiadosFranquia[i], elementFiliado, idTabelaMigracao, classe);
                 }
+                Thread.Sleep(5000);
                 _base.AcessarPaginaPrincipal();
                 AcessarTelaFinalizarMigracao();
             }
@@ -82,33 +85,69 @@ namespace Migracao
 
         private void BtnConfirmarMigracao(DadosFiliado filiado, IWebElement elementFiliado, string tabela, string classe)
         {
-            var btnMigrar = "//*[@id=" + tabela + "]/tbody/tr[@class=" + classe + "]/td/input[@title=\"Migrar Cliente\"]";
-            elementFiliado.FindElement(By.XPath(btnMigrar)).Click();
-
-
-            var formaPagamentoPai = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[@id=\"ContentPlaceHolder1_ucFormasPagto_ddlFormaPagto\"]")));
-            formaPagamentoPai.Click();
-            formaPagamentoPai.FindElement(By.XPath("//select/option[@value=" + filiado.idFormaPgtoPai + "]")).Click();
-
-            var formaPagamento = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[@id=\"ContentPlaceHolder1_ucFormasPagto_PagtoEnergia_ddlInstituicao\"]")));
-            formaPagamento.Click();
-            formaPagamento.FindElement(By.XPath("//select/option[@value=" + filiado.idFormaPgto + "]")).Click();
-
-            if (filiado.idFormaPgtoPai == 5301129)
+            try 
             {
-                var uc = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[@id=\"ContentPlaceHolder1_ucFormasPagto_PagtoEnergia_txbUC\"]")));
-                uc.Click();
-                uc.FindElement(By.XPath("//*[@id=\"ContentPlaceHolder1_ucFormasPagto_PagtoEnergia_txbUC\"]")).SendKeys(filiado.uc.ToString());
+                var btnMigrar = "//*[@id=" + tabela + "]/tbody/tr[@class=" + classe + "]/td/input[@title=\"Migrar Cliente\"]";
+                elementFiliado.FindElement(By.XPath(btnMigrar)).Click();
+
+                var formaPagamentoPai = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[@id=\"ContentPlaceHolder1_ucFormasPagto_ddlFormaPagto\"]")));
+                formaPagamentoPai.Click();
+                formaPagamentoPai.FindElement(By.XPath("//select/option[@value=" + filiado.idFormaPgtoPai + "]")).Click();
+
+                var xPathFormaPgto = VerificarXPathFormaPagameto(filiado.idFormaPgtoPai);
+                if (!string.IsNullOrEmpty(xPathFormaPgto))
+                {
+                    var formaPagamento = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath(xPathFormaPgto)));
+                    formaPagamento.Click();
+                    formaPagamento.FindElement(By.XPath("//select/option[@value=" + filiado.idFormaPgto + "]")).Click();
+                }
+
+                if (filiado.idFormaPgtoPai == 5301129)
+                {
+                    var uc = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[@id=\"ContentPlaceHolder1_ucFormasPagto_PagtoEnergia_txbUC\"]")));
+                    uc.Click();
+                    uc.FindElement(By.XPath("//*[@id=\"ContentPlaceHolder1_ucFormasPagto_PagtoEnergia_txbUC\"]")).SendKeys(filiado.uc.ToString());
+                }
+
+                var migrar = wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("ContentPlaceHolder1_btnMigrar")));
+                migrar.Click();
+
+                var messageBox = wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("MyMessageBox1_MessageBoxInterface")));
+                var retorno = messageBox.Text;
+
+                _base.GravarLog(filiado.documento, retorno);
             }
+            catch 
+            {
+                _base.GravarLog(filiado.documento, "Migração já realizada ou Não encontrado");
+            }
+        }
 
-
-            var migrar = wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("ContentPlaceHolder1_btnMigrar")));
-            migrar.Click();
-
-            var messageBox = wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("MyMessageBox1_MessageBoxInterface")));
-            var retorno = messageBox.Text;
-
-            _base.GravarLog(filiado.documento, retorno);
+        private string VerificarXPathFormaPagameto(int idFormaPgtoPai)
+        {
+            var xPath = "";
+            switch (idFormaPgtoPai)
+            {
+                case 5301129: //CONCESIONÁRIA ENERGIA
+                    xPath = "//*[@id=\"ContentPlaceHolder1_ucFormasPagto_PagtoEnergia_ddlInstituicao\"]";
+                    break;
+                case 5300079: //CREDIFACIL
+                    xPath = "";
+                    break;
+                case 3200: //PAGO EN LA OFICINA
+                    xPath = "//*[@id=\"ContentPlaceHolder1_ucFormasPagto_PagtoDiretoCTN_ddlTipoCTN\"]";
+                    break;
+                case 5300081: //PAYVALIDA
+                    xPath = "//*[@id=\"ContentPlaceHolder1_ucFormasPagto_PagtoPayvalida_ddlTipoPayvalida\"]";
+                    break;
+                case 5301109: //TARJETA (DEBITO/CREDITO)
+                    xPath = "";
+                    break;
+                default:
+                    Console.WriteLine("Default case");
+                    break;
+            }
+            return xPath;
         }
     }
 }

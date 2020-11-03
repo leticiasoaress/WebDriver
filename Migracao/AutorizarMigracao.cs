@@ -51,18 +51,13 @@ namespace Migracao
         {
             const string XPathPaginacao = "//*[@id=\"ContentPlaceHolder1_gvAutorizaMigracao\"]/tbody/tr[@class=\"paginacao-dinamico\"]/td/table/tbody/tr";
             var idTabelaAutorizacao = "\"ContentPlaceHolder1_gvAutorizaMigracao\"";
-            var quantidadePagina = 1;
             var filiadosFranquia = filiadosParaMigrar.listaFiliado.Where(m => m.idFranquiaOrigem == idFranquia).ToList();
 
-            if (_base.VerificarPaginacao(idTabelaAutorizacao))
-            {
-                var paginacao = navegador.FindElements(By.XPath(XPathPaginacao));
-                quantidadePagina = paginacao.Count();
-            }
+            var paginacao = _base.VerificarPaginacao(idTabelaAutorizacao);
 
             for (int i = 0; i < filiadosFranquia.Count(); i++)
             {
-                var (elementFiliado, classe) = _base.PercorrerPaginacao(filiadosFranquia[i].documento, quantidadePagina, idTabelaAutorizacao);
+                var (elementFiliado, classe) = _base.PercorrerPaginacao(filiadosFranquia[i].documento, paginacao, idTabelaAutorizacao);
                 if (elementFiliado != null)
                 {
                     BtnAutorizarMigracao(filiadosFranquia[i].documento, elementFiliado, idTabelaAutorizacao, classe);

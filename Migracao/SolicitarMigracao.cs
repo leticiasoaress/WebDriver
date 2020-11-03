@@ -22,7 +22,7 @@ namespace Migracao
             _base = new Base(_navegador);
         }
 
-        public void ConfigurarOrdemExecucao()
+        public void ConfigurarOrdemExecucao2()
         {
             Console.Clear();
             Console.WriteLine("Iniciando pedido de migração.\n\n");
@@ -32,7 +32,7 @@ namespace Migracao
 
             for (int i = 0; i < listaFiliado.Count(); i++)
             {
-                if (i == (listaFiliado.Count / 2))
+                if (i == (listaFiliado.Count() / 2))
                 {
                     Thread.Sleep(10000);
                 }
@@ -43,6 +43,18 @@ namespace Migracao
                 _base.GravarLog(log, retorno);
                 AcessarPaginaPrincipal();
             }
+        }
+        public void ConfigurarOrdemExecucao(string documento)
+        {
+            Console.Clear();
+            Console.WriteLine("Iniciando pedido de migração.\n\n");
+            Console.WriteLine("Log dos documentos");
+
+            AcessarTelaSolicitarMigracao();
+            PesquisarMigracao(documento);
+            var retorno = RealizarPedidoMigracao();
+            _base.GravarLog(documento, retorno);
+            AcessarPaginaPrincipal();
         }
 
         private void AcessarPaginaPrincipal()
