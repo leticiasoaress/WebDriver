@@ -9,9 +9,7 @@ namespace Migracao
     {
         private IWebDriver driver;
         private Login login;
-        private SolicitarMigracao solicitarMigracao;
-        private AutorizarMigracao autorizarMigracao;
-        private MigrarFiliado migrarFiliado;
+        private ConfigurarMigracao configurarMigracao;
 
         public Setup(string url)
         {
@@ -21,9 +19,7 @@ namespace Migracao
             driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(5);
 
             login = new Login(driver);
-            solicitarMigracao = new SolicitarMigracao(driver);
-            autorizarMigracao = new AutorizarMigracao(driver, login);
-            migrarFiliado = new MigrarFiliado(driver);
+            configurarMigracao = new ConfigurarMigracao(driver);
         }
 
         public void ConfigurarOrdemExecucao()
@@ -32,9 +28,7 @@ namespace Migracao
             InformarAcesso();
             login.SelecionarRegional(1);
             login.SelecionarFranquia(7);
-            //solicitarMigracao.ConfigurarOrdemExecucao();
-            //autorizarMigracao.ConfigurarOrdemExecucao();
-            migrarFiliado.ConfigurarOrdemExecucao();
+            configurarMigracao.ConfigurarOrdemExecucao();
         }
 
         public void InformarAcesso()

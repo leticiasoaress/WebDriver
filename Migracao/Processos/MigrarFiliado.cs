@@ -1,10 +1,6 @@
 ﻿using OpenQA.Selenium;
 using SeleniumExtras.WaitHelpers;
 using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Runtime.InteropServices;
 using System.Threading;
 using SupportUI = OpenQA.Selenium.Support.UI;
 
@@ -12,28 +8,23 @@ namespace Migracao
 {
     public class MigrarFiliado
     {
-        private readonly IWebDriver navegador;
-        private FiliadosParaMigrar filiadosParaMigrar;
         private Base _base;
         private SupportUI.WebDriverWait wait;
 
         public MigrarFiliado(IWebDriver _navegador)
         {
-            navegador = _navegador;
             _base = new Base(_navegador);
-            filiadosParaMigrar = new FiliadosParaMigrar();
-            wait = new SupportUI.WebDriverWait(_navegador, TimeSpan.FromSeconds(60));
+            wait = new SupportUI.WebDriverWait(_navegador, TimeSpan.FromSeconds(35));
         }
 
-        public void ConfigurarOrdemExecucao()
+        public void MigrarFiliadoFranquia(DadosFiliado filiado)
         {
-            Console.WriteLine("\n\n Iniciando a migração dos filiados.\n\n");
-            Console.WriteLine("Log das migrações");
-            AcessarTelaFinalizarMigracao();
-            VerificarPedidosMigracao();
+            AcessarTelaMigrarFiliado();
+            VerificarPedidosMigracao(filiado);
+            _base.AcessarPaginaPrincipal();
         }
 
-        private void AcessarTelaFinalizarMigracao()
+        private void AcessarTelaMigrarFiliado()
         {
             var menuUsuario = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[@id=\"1\"]/h3")));
             menuUsuario.Click();
@@ -63,51 +54,32 @@ namespace Migracao
             btnPesquisar.Click();
         }
 
-        private void VerificarPedidosMigracao()
+        private void VerificarPedidosMigracao(DadosFiliado filiado)
         {
             var idTabelaMigracao = "\"ContentPlaceHolder1_gvMigracao\"";
-            var filiadosFranquia = filiadosParaMigrar.listaFiliado.ToList();
 
-            var paginacao = _base.VerificarPaginacao(idTabelaMigracao);
+            Thread.Sleep(2000);
 
-            for (int i = 0; i < filiadosFranquia.Count(); i++)
+            var (elementFiliado, classe) = _base.LocalizarDocumentoTela(filiado.documento, idTabelaMigracao);
+
+            if (elementFiliado != null)
             {
-                var (elementFiliado, classe) = _base.PercorrerPaginacao(filiadosFranquia[i].documento, paginacao, idTabelaMigracao);
-                if (elementFiliado != null)
-                {
-                    BtnConfirmarMigracao(filiadosFranquia[i], elementFiliado, idTabelaMigracao, classe);
-                }
-                Thread.Sleep(5000);
-                _base.AcessarPaginaPrincipal();
-                AcessarTelaFinalizarMigracao();
+                BtnConfirmarMigracao(filiado, elementFiliado, idTabelaMigracao, classe);
+            }
+            else
+            {
+                _base.GravarLog($"\nMigrar filiado \nErro: Falha ao tentar localizar o filiado.");
             }
         }
 
         private void BtnConfirmarMigracao(DadosFiliado filiado, IWebElement elementFiliado, string tabela, string classe)
         {
-            try 
+            try
             {
                 var btnMigrar = "//*[@id=" + tabela + "]/tbody/tr[@class=" + classe + "]/td/input[@title=\"Migrar Cliente\"]";
                 elementFiliado.FindElement(By.XPath(btnMigrar)).Click();
 
-                var formaPagamentoPai = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[@id=\"ContentPlaceHolder1_ucFormasPagto_ddlFormaPagto\"]")));
-                formaPagamentoPai.Click();
-                formaPagamentoPai.FindElement(By.XPath("//select/option[@value=" + filiado.idFormaPgtoPai + "]")).Click();
-
-                var xPathFormaPgto = VerificarXPathFormaPagameto(filiado.idFormaPgtoPai);
-                if (!string.IsNullOrEmpty(xPathFormaPgto))
-                {
-                    var formaPagamento = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath(xPathFormaPgto)));
-                    formaPagamento.Click();
-                    formaPagamento.FindElement(By.XPath("//select/option[@value=" + filiado.idFormaPgto + "]")).Click();
-                }
-
-                if (filiado.idFormaPgtoPai == 5301129)
-                {
-                    var uc = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[@id=\"ContentPlaceHolder1_ucFormasPagto_PagtoEnergia_txbUC\"]")));
-                    uc.Click();
-                    uc.FindElement(By.XPath("//*[@id=\"ContentPlaceHolder1_ucFormasPagto_PagtoEnergia_txbUC\"]")).SendKeys(filiado.uc.ToString());
-                }
+                PreencherFormaPagamento(filiado);
 
                 var migrar = wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("ContentPlaceHolder1_btnMigrar")));
                 migrar.Click();
@@ -115,11 +87,33 @@ namespace Migracao
                 var messageBox = wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("MyMessageBox1_MessageBoxInterface")));
                 var retorno = messageBox.Text;
 
-                _base.GravarLog(filiado.documento, retorno);
+                _base.GravarLog($"\nMigrar filiado \nRetorno: {retorno}");
             }
-            catch 
+            catch (Exception ex)
             {
-                _base.GravarLog(filiado.documento, "Migração já realizada ou Não encontrado");
+                _base.GravarLog($"\nMigrar filiado \nErro --> {ex.Message}");
+            }
+        }
+
+        private void PreencherFormaPagamento(DadosFiliado filiado)
+        {
+            var formaPagamentoPai = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[@id=\"ContentPlaceHolder1_ucFormasPagto_ddlFormaPagto\"]")));
+            formaPagamentoPai.Click();
+            formaPagamentoPai.FindElement(By.XPath("//select/option[@value=" + filiado.idFormaPgtoPai + "]")).Click();
+
+            var xPathFormaPgto = VerificarXPathFormaPagameto(filiado.idFormaPgtoPai);
+            if (!string.IsNullOrEmpty(xPathFormaPgto))
+            {
+                var formaPagamento = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath(xPathFormaPgto)));
+                formaPagamento.Click();
+                formaPagamento.FindElement(By.XPath("//select/option[@value=" + filiado.idFormaPgto + "]")).Click();
+
+                if (filiado.idFormaPgtoPai == 5301129) //Concessionaria
+                {
+                    var uc = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[@id=\"ContentPlaceHolder1_ucFormasPagto_PagtoEnergia_txbUC\"]")));
+                    uc.Click();
+                    uc.FindElement(By.XPath("//*[@id=\"ContentPlaceHolder1_ucFormasPagto_PagtoEnergia_txbUC\"]")).SendKeys(filiado.uc.ToString());
+                }
             }
         }
 
