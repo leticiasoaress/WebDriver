@@ -18,40 +18,19 @@ namespace Migracao
         {
             navegador = _navegador;
             filiadosParaMigrar = new FiliadosParaMigrar();
-            wait = new SupportUI.WebDriverWait(_navegador, TimeSpan.FromSeconds(40));
+            wait = new SupportUI.WebDriverWait(_navegador, TimeSpan.FromSeconds(35));
             _base = new Base(_navegador);
         }
 
-        public void ConfigurarOrdemExecucao()
+        public string SolicitarMigracaoFranquia(string documento)
         {
-            Console.Clear();
-            Console.WriteLine("Iniciando pedido de migração.\n\n");
-            Console.WriteLine("Log dos documentos");
-
-            var listaFiliado = filiadosParaMigrar.listaFiliado.ToList();
-
-            for (int i = 0; i < listaFiliado.Count(); i++)
-            {
-                if (i == (listaFiliado.Count / 2))
-                {
-                    Thread.Sleep(10000);
-                }
-                AcessarTelaSolicitarMigracao();
-                PesquisarMigracao(listaFiliado[i].documento);
-                var log = $"{i + 1}: {listaFiliado[i].documento}";
-                var retorno = RealizarPedidoMigracao();
-                _base.GravarLog(log, retorno);
-                AcessarPaginaPrincipal();
-            }
-        }
-
-        private void AcessarPaginaPrincipal()
-        {
-            const string Url = "//*[@id=\"0\"]/ul/li/a[@href=\"../../PrincipalMensagens.aspx\"]";
-
-            navegador.FindElement(By.XPath("//*[@id=\"0\"]/h3")).Click();
-            wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath(Url)));
-            navegador.FindElement(By.XPath(Url)).Click();
+            AcessarTelaSolicitarMigracao();
+            PesquisarMigracao(documento);
+            var retorno = RealizarPedidoMigracao();
+            var log = $"\nDocumento: {documento} \nSolicitar migração \nRetorno: {retorno}";
+            _base.GravarLog(log);
+            _base.AcessarPaginaPrincipal();
+            return retorno;
         }
 
         private void AcessarTelaSolicitarMigracao()

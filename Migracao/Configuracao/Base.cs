@@ -2,6 +2,7 @@
 using SeleniumExtras.WaitHelpers;
 using System;
 using System.Linq;
+using System.Threading;
 using SupportUI = OpenQA.Selenium.Support.UI;
 
 namespace Migracao
@@ -14,51 +15,24 @@ namespace Migracao
         public Base(IWebDriver _navegador)
         {
             navegador = _navegador;
-            wait = new SupportUI.WebDriverWait(_navegador, TimeSpan.FromSeconds(40));
+            wait = new SupportUI.WebDriverWait(_navegador, TimeSpan.FromSeconds(10));
         }
 
-        public bool VerificarPaginacao(string idTabelaMigracao)
+        public string[] VerificarPaginacao(string idTabelaMigracao)
         {
             try
             {
                 var xPath = "//*[@id="+idTabelaMigracao+"]/tbody/tr[@class=\"paginacao-dinamico\"]";
-                navegador.FindElement(By.XPath(xPath));
-                return true;
+                var paginacao = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath(xPath)));
+                return paginacao.Text.Split(" ");
             }
             catch (NoSuchElementException)
             {
-                return false;
+                return null;
             }
         }
 
-        public (IWebElement, string) PercorrerPaginacao(string documento, int quantidadePagina, string idTabelaMigracao)
-        {
-            IWebElement filiado = null;
-            string classe = "";
-            string XPathPaginacao = "//*[@id=" + idTabelaMigracao + "]/tbody/tr[@class=\"paginacao-dinamico\"]/td/table/tbody/tr/td/a";
-
-            IWebElement mudarPagina = null;
-   
-            for (int j = 1; j <= quantidadePagina; j++)
-            {
-                (filiado, classe) = LocalizarDocumentoTela(documento, idTabelaMigracao);
- 
-                if (filiado != null)
-                {
-                    return (filiado, classe);
-                }
-                else if (quantidadePagina >= 1)
-                {
-                    var proximaPagina = j + 1;
-                    mudarPagina = navegador.FindElements(By.XPath(XPathPaginacao)).Where(m => m.Text == proximaPagina.ToString()).FirstOrDefault();
-                    mudarPagina.Click();
-                }
-            }
-    
-            return (null, classe);
-        }
-
-        private (IWebElement, string) LocalizarDocumentoTela(string documento, string idTabelaMigracao)
+        public (IWebElement, string) LocalizarDocumentoTela(string documento, string idTabelaMigracao)
         {
             IWebElement filiado = null;
             string classe = "";
@@ -76,6 +50,7 @@ namespace Migracao
             try
             {
                 var xPath = "//*[@id=" + idTabelaMigracao + "]/tbody/tr[@class=" + nomeClass + "]";
+                wait.Until(ExpectedConditions.ElementExists(By.XPath(xPath)));
                 return (navegador.FindElements(By.XPath(xPath)).Where(m => m.Text.Contains(documento)).FirstOrDefault(), nomeClass);
             }
             catch
@@ -84,9 +59,9 @@ namespace Migracao
             }
         }
 
-        public void GravarLog(string documento, string retorno)
+        public void GravarLog(string retorno)
         {
-            Console.WriteLine($@"Documento: {documento} --> Retorno: {retorno}");
+            Console.WriteLine(retorno);
         }
 
         public void AcessarPaginaPrincipal()
@@ -94,8 +69,8 @@ namespace Migracao
             const string Url = "//*[@id=\"0\"]/ul/li/a[@href=\"../../PrincipalMensagens.aspx\"]";
 
             navegador.FindElement(By.XPath("//*[@id=\"0\"]/h3")).Click();
-            wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath(Url)));
-            navegador.FindElement(By.XPath(Url)).Click();
+            var paginaPrincipal = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath(Url)));
+            paginaPrincipal.Click();
         }
     }
 }

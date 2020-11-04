@@ -7,7 +7,7 @@ namespace Migracao
         private static string[] listaUrl = {
                                              "http://treinamento.sistematodos.com.br:82/CTN/Login.aspx",
                                              "https://homologacao.sistematodos.com.br/CTN/Login.aspx",
-                                             "http://treinamento.sistematodos.com.br:82/CTN_CO/Login.aspx"
+                                             "http://localhost/CTN.UICartaoTodos/Login.aspx"
                                            };
 
         private static void Main(string[] args)
