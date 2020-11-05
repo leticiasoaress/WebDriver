@@ -2,6 +2,7 @@
 using System;
 using SupportUI = OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
+using System.Threading;
 
 namespace Migracao
 {
@@ -18,7 +19,7 @@ namespace Migracao
         public Login(IWebDriver _navegador)
         {
             navegador = _navegador;
-            wait = new SupportUI.WebDriverWait(_navegador, TimeSpan.FromSeconds(40));
+            wait = new SupportUI.WebDriverWait(_navegador, TimeSpan.FromSeconds(60));
         }
 
         private void SetLogin(string _login)
@@ -55,6 +56,7 @@ namespace Migracao
 
         public void SelecionarFranquia(int idFranquia)
         {
+            Thread.Sleep(2000);
             wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("ContentPlaceHolder1_ddlFranquia")));
 
             navegador.FindElement(By.Id("ContentPlaceHolder1_ddlFranquia")).Click();

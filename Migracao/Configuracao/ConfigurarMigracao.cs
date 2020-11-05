@@ -40,7 +40,7 @@ namespace Migracao
                 }
                 
                 contador++;
-                Thread.Sleep(3000);
+                Thread.Sleep(5000);
             }
             Console.WriteLine("\nProcesso finalizado: " + DateTime.Now);
         }

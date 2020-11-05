@@ -14,11 +14,12 @@ namespace Migracao
         public MigrarFiliado(IWebDriver _navegador)
         {
             _base = new Base(_navegador);
-            wait = new SupportUI.WebDriverWait(_navegador, TimeSpan.FromSeconds(35));
+            wait = new SupportUI.WebDriverWait(_navegador, TimeSpan.FromSeconds(60));
         }
 
         public void MigrarFiliadoFranquia(DadosFiliado filiado)
         {
+            Thread.Sleep(3000);
             AcessarTelaMigrarFiliado();
             VerificarPedidosMigracao(filiado);
             _base.AcessarPaginaPrincipal();
@@ -84,8 +85,11 @@ namespace Migracao
                 var migrar = wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("ContentPlaceHolder1_btnMigrar")));
                 migrar.Click();
 
+                Thread.Sleep(2000);
+
                 var messageBox = wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("MyMessageBox1_MessageBoxInterface")));
                 var retorno = messageBox.Text;
+                messageBox = null;
 
                 _base.GravarLog($"\nMigrar filiado \nRetorno: {retorno}");
             }
@@ -112,7 +116,8 @@ namespace Migracao
                 {
                     var uc = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[@id=\"ContentPlaceHolder1_ucFormasPagto_PagtoEnergia_txbUC\"]")));
                     uc.Click();
-                    uc.FindElement(By.XPath("//*[@id=\"ContentPlaceHolder1_ucFormasPagto_PagtoEnergia_txbUC\"]")).SendKeys(filiado.uc.ToString());
+                    uc.FindElement(By.XPath("//*[@id=\"ContentPlaceHolder1_ucFormasPagto_PagtoEnergia_txbUC\"]")).Clear();
+                    uc.FindElement(By.XPath("//*[@id=\"ContentPlaceHolder1_ucFormasPagto_PagtoEnergia_txbUC\"]")).SendKeys(filiado.uc);
                 }
             }
         }
