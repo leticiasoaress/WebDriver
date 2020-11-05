@@ -14,7 +14,7 @@ namespace Migracao
         public MigrarFiliado(IWebDriver _navegador)
         {
             _base = new Base(_navegador);
-            wait = new SupportUI.WebDriverWait(_navegador, TimeSpan.FromSeconds(35));
+            wait = new SupportUI.WebDriverWait(_navegador, TimeSpan.FromSeconds(60));
         }
 
         public void MigrarFiliadoFranquia(DadosFiliado filiado)
@@ -116,7 +116,8 @@ namespace Migracao
                 {
                     var uc = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[@id=\"ContentPlaceHolder1_ucFormasPagto_PagtoEnergia_txbUC\"]")));
                     uc.Click();
-                    uc.FindElement(By.XPath("//*[@id=\"ContentPlaceHolder1_ucFormasPagto_PagtoEnergia_txbUC\"]")).SendKeys(filiado.uc.ToString());
+                    uc.FindElement(By.XPath("//*[@id=\"ContentPlaceHolder1_ucFormasPagto_PagtoEnergia_txbUC\"]")).Clear();
+                    uc.FindElement(By.XPath("//*[@id=\"ContentPlaceHolder1_ucFormasPagto_PagtoEnergia_txbUC\"]")).SendKeys(filiado.uc);
                 }
             }
         }

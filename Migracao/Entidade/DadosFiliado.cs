@@ -16,9 +16,9 @@ namespace Migracao
         
         public int idFormaPgto { get; set; }
 
-        public int uc { get; set; }
+        public string uc { get; set; }
 
-        public DadosFiliado(string _documento, int _idRegionalOrigem, int _idFranquiaOrigem, int _idFormaPgtoPai, int _idFormaPgto, int _uc)
+        public DadosFiliado(string _documento, int _idRegionalOrigem, int _idFranquiaOrigem, int _idFormaPgtoPai, int _idFormaPgto, string _uc)
         {
             documento = _documento;
             idFranquiaOrigem = _idFranquiaOrigem;
