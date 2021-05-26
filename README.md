@@ -1,6 +1,6 @@
 # WebDriver - Migração automatizada
 
-Projeto desenvolvido em C# utilizando Selenium para possibilitar realizar testes mais rapidos e eficientes no sistema.
+Projeto desenvolvido em C# utilizando Selenium para possibilitar realizar migrações de forma automatica.
 
 ### Processos realizados
 #### Selecionar o sistema
