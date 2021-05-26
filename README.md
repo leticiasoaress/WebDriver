@@ -1,4 +1,4 @@
-# WebDriver - Testes automatizados
+# WebDriver - Migração automatizada
 
 Projeto desenvolvido em C# utilizando Selenium para possibilitar realizar testes mais rapidos e eficientes no sistema.
 
