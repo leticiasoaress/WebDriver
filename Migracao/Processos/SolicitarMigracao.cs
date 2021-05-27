@@ -19,7 +19,7 @@ namespace Migracao
         {
             navegador = _navegador;
             filiadosParaMigrar = new FiliadosParaMigrar();
-            wait = new SupportUI.WebDriverWait(_navegador, TimeSpan.FromSeconds(35));
+            wait = new SupportUI.WebDriverWait(_navegador, TimeSpan.FromSeconds(60));
             _base = new Base(_navegador);
         }
 

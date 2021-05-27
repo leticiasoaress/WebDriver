@@ -15,7 +15,7 @@ namespace Migracao
         public MigrarFiliado(IWebDriver _navegador)
         {
             _base = new Base(_navegador);
-            wait = new SupportUI.WebDriverWait(_navegador, TimeSpan.FromSeconds(35));
+            wait = new SupportUI.WebDriverWait(_navegador, TimeSpan.FromSeconds(60));
         }
 
         public void MigrarFiliadoFranquia(DadosFiliado filiado, StreamWriter arquivo)
