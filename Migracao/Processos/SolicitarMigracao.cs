@@ -1,6 +1,7 @@
 ﻿using OpenQA.Selenium;
 using SeleniumExtras.WaitHelpers;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using SupportUI = OpenQA.Selenium.Support.UI;
@@ -22,14 +23,17 @@ namespace Migracao
             _base = new Base(_navegador);
         }
 
-        public string SolicitarMigracaoFranquia(string documento)
+        public string SolicitarMigracaoFranquia(string documento, StreamWriter arquivo)
         {
             AcessarTelaSolicitarMigracao();
             PesquisarMigracao(documento);
+
             var retorno = RealizarPedidoMigracao();
             var log = $"\nDocumento: {documento} \nSolicitar migração \nRetorno: {retorno}";
-            _base.GravarLog(log);
+           
+            _base.GravarLog(arquivo, log);
             _base.AcessarPaginaPrincipal();
+           
             return retorno;
         }
 

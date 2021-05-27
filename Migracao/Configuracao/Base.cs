@@ -1,6 +1,7 @@
 ﻿using OpenQA.Selenium;
 using SeleniumExtras.WaitHelpers;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using SupportUI = OpenQA.Selenium.Support.UI;
@@ -16,20 +17,6 @@ namespace Migracao
         {
             navegador = _navegador;
             wait = new SupportUI.WebDriverWait(_navegador, TimeSpan.FromSeconds(10));
-        }
-
-        public string[] VerificarPaginacao(string idTabelaMigracao)
-        {
-            try
-            {
-                var xPath = "//*[@id="+idTabelaMigracao+"]/tbody/tr[@class=\"paginacao-dinamico\"]";
-                var paginacao = wait.Until(ExpectedConditions.ElementIsVisible(By.XPath(xPath)));
-                return paginacao.Text.Split(" ");
-            }
-            catch (NoSuchElementException)
-            {
-                return null;
-            }
         }
 
         public (IWebElement, string) LocalizarDocumentoTela(string documento, string idTabelaMigracao)
@@ -59,9 +46,26 @@ namespace Migracao
             }
         }
 
-        public void GravarLog(string retorno)
+        public StreamWriter GerarTxt()
         {
-            Console.WriteLine(retorno);
+            string nomeArquivo = $"migracaoColombia-{DateTime.Now.ToString().Replace("/", "-").Replace(" ", "-").Replace(":", ".")}";
+            string CaminhoArquivo = $"C:\\Users\\12183934670\\Desktop\\MigracaoColombia\\{nomeArquivo}.txt";
+
+            return File.CreateText(CaminhoArquivo);
+        }
+        
+        public void GravarLog(StreamWriter arquivo, string mensagem)
+        {
+            // Escreve no arquivo de texto
+            arquivo.WriteLine(mensagem);
+
+            // Escreve no console
+            Console.WriteLine(mensagem);
+        }
+
+        public void FecharTxt(StreamWriter arquivo)
+        {
+            arquivo.Close();
         }
 
         public void AcessarPaginaPrincipal()

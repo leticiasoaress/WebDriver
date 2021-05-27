@@ -1,6 +1,7 @@
 ﻿using OpenQA.Selenium;
 using SeleniumExtras.WaitHelpers;
 using System;
+using System.IO;
 using System.Threading;
 using SupportUI = OpenQA.Selenium.Support.UI;
 
@@ -17,11 +18,11 @@ namespace Migracao
             wait = new SupportUI.WebDriverWait(_navegador, TimeSpan.FromSeconds(35));
         }
 
-        public void MigrarFiliadoFranquia(DadosFiliado filiado)
+        public void MigrarFiliadoFranquia(DadosFiliado filiado, StreamWriter arquivo)
         {
             Thread.Sleep(3000);
             AcessarTelaMigrarFiliado();
-            VerificarPedidosMigracao(filiado);
+            VerificarPedidosMigracao(filiado, arquivo);
             _base.AcessarPaginaPrincipal();
         }
 
@@ -42,20 +43,20 @@ namespace Migracao
             var ddlMeses = wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("ContentPlaceHolder1_dtAnoMes_ddlMeses")));
             ddlMeses.Click();
             {
-                ddlMeses.FindElement(By.XPath("//select/option[@value=11]")).Click();
+                ddlMeses.FindElement(By.XPath("//select/option[@value=05]")).Click();
             }
 
             var ddlAno = wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("ContentPlaceHolder1_dtAnoMes_ddlAno")));
             ddlAno.Click();
             {
-                ddlAno.FindElement(By.XPath("//select/option[@value=2020]")).Click();
+                ddlAno.FindElement(By.XPath("//select/option[@value=2021]")).Click();
             }
 
             var btnPesquisar = wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("ContentPlaceHolder1_btnPesquisar")));
             btnPesquisar.Click();
         }
 
-        private void VerificarPedidosMigracao(DadosFiliado filiado)
+        private void VerificarPedidosMigracao(DadosFiliado filiado, StreamWriter arquivo)
         {
             var idTabelaMigracao = "\"ContentPlaceHolder1_gvMigracao\"";
 
@@ -65,15 +66,15 @@ namespace Migracao
 
             if (elementFiliado != null)
             {
-                BtnConfirmarMigracao(filiado, elementFiliado, idTabelaMigracao, classe);
+                BtnConfirmarMigracao(filiado, elementFiliado, idTabelaMigracao, classe, arquivo);
             }
             else
             {
-                _base.GravarLog($"\nMigrar filiado \nErro: Falha ao tentar localizar o filiado.");
+                _base.GravarLog(arquivo, $"\nMigrar filiado \nErro: Falha ao tentar localizar o filiado.");
             }
         }
 
-        private void BtnConfirmarMigracao(DadosFiliado filiado, IWebElement elementFiliado, string tabela, string classe)
+        private void BtnConfirmarMigracao(DadosFiliado filiado, IWebElement elementFiliado, string tabela, string classe, StreamWriter arquivo)
         {
             try
             {
@@ -91,11 +92,11 @@ namespace Migracao
                 var retorno = messageBox.Text;
                 messageBox = null;
 
-                _base.GravarLog($"\nMigrar filiado \nRetorno: {retorno}");
+                _base.GravarLog(arquivo, $"\nMigrar filiado \nRetorno: {retorno}");
             }
             catch (Exception ex)
             {
-                _base.GravarLog($"\nMigrar filiado \nErro --> {ex.Message}");
+                _base.GravarLog(arquivo, $"\nMigrar filiado \nErro --> {ex.Message}");
             }
         }
 
@@ -116,7 +117,7 @@ namespace Migracao
                 {
                     var uc = wait.Until(ExpectedConditions.ElementToBeClickable(By.XPath("//*[@id=\"ContentPlaceHolder1_ucFormasPagto_PagtoEnergia_txbUC\"]")));
                     uc.Click();
-                    uc.FindElement(By.XPath("//*[@id=\"ContentPlaceHolder1_ucFormasPagto_PagtoEnergia_txbUC\"]")).SendKeys(filiado.uc.ToString());
+                    uc.FindElement(By.XPath("//*[@id=\"ContentPlaceHolder1_ucFormasPagto_PagtoEnergia_txbUC\"]")).SendKeys(filiado.uc);
                 }
             }
         }
