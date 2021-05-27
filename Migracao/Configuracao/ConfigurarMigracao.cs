@@ -2,7 +2,6 @@
 using System;
 using System.Linq;
 using System.Threading;
-using SupportUI = OpenQA.Selenium.Support.UI;
 
 namespace Migracao
 {
@@ -11,38 +10,42 @@ namespace Migracao
         private FiliadosParaMigrar filiadosParaMigrar;
         private SolicitarMigracao solicitarMigracao;
         private MigrarFiliado migrarFiliado;
+        private Base _base;
 
         public ConfigurarMigracao(IWebDriver _navegador)
         {
             filiadosParaMigrar = new FiliadosParaMigrar();
             solicitarMigracao = new SolicitarMigracao(_navegador);
             migrarFiliado = new MigrarFiliado(_navegador);
+            _base = new Base(_navegador);
         }
 
         public void ConfigurarOrdemExecucao()
         {
             Console.Clear();
-            Console.WriteLine("Iniciando processo de migração.\n");
-            Console.WriteLine("Processo iniciado: " + DateTime.Now);
+           
+            var arquivo = _base.GerarTxt();
+            _base.GravarLog(arquivo, "Iniciando processo de migração.\n");
+            _base.GravarLog(arquivo, $"Processo iniciado: {DateTime.Now} \n");
 
             int contador = 1;
             int quantidadePedido = filiadosParaMigrar.listaFiliado.Count();
 
             foreach (var filiado in filiadosParaMigrar.listaFiliado)
             {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"\n\nPedido {contador} / {quantidadePedido}");
-                Console.ResetColor();
-                var retorno = solicitarMigracao.SolicitarMigracaoFranquia(filiado.documento);
+                _base.GravarLog(arquivo, $"\nPedido {contador} / {quantidadePedido}");
+
+                var retorno = solicitarMigracao.SolicitarMigracaoFranquia(filiado.documento, arquivo);
                 if (retorno == "Filiado autorizado com sucesso.")
                 {
-                    migrarFiliado.MigrarFiliadoFranquia(filiado);
+                    migrarFiliado.MigrarFiliadoFranquia(filiado, arquivo);
                 }
                 
                 contador++;
                 Thread.Sleep(5000);
             }
-            Console.WriteLine("\nProcesso finalizado: " + DateTime.Now);
+            _base.GravarLog(arquivo, $"\nProcesso finalizado: {DateTime.Now} \n\n");
+            _base.FecharTxt(arquivo);
         }
     }
 }

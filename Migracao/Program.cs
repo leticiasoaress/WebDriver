@@ -5,9 +5,9 @@ namespace Migracao
     public class Program
     {
         private static string[] listaUrl = {
-                                             "http://treinamento.sistematodos.com.br:82/CTN/Login.aspx",
+                                             "https://treinamento.sistematodos.com.br:82/CTN_CO/Login.aspx",
                                              "https://homologacao.sistematodos.com.br/CTN/Login.aspx",
-                                             "http://localhost/CTN.UICartaoTodos/Login.aspx",
+                                             "http://localhost/CTN.UICartaoTodos/",
                                              "http://192.168.254.70/CTN.UICartaoTodos/"
                                            };
 
